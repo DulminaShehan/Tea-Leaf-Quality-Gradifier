@@ -1,13 +1,14 @@
 import { useEffect, useRef, useState } from "react";
-import { Text, View, TouchableOpacity, StyleSheet, Image } from "react-native";
+import { Text, View, TouchableOpacity, StyleSheet, Image, Platform } from "react-native";
 import { Camera } from "expo-camera";
 
 export default function HomeScreen() {
-  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
+  const [hasPermission, setHasPermission] = useState<boolean | null>(Platform.OS !== "web" ? null : true);
   const [photo, setPhoto] = useState<string | null>(null);
   const cameraRef = useRef<Camera | null>(null);
 
   useEffect(() => {
+    if (Platform.OS === "web") return;
     (async () => {
       const { status } = await Camera.requestCameraPermissionsAsync();
       setHasPermission(status === "granted");
@@ -18,6 +19,10 @@ export default function HomeScreen() {
   if (hasPermission === false) return <Text>No access to camera</Text>;
 
   const takePicture = async () => {
+    if (Platform.OS === "web") {
+      alert("Camera not supported on web. Please use on mobile.");
+      return;
+    }
     if (cameraRef.current) {
       const pic = await cameraRef.current.takePictureAsync();
       setPhoto(pic.uri);
@@ -33,6 +38,10 @@ export default function HomeScreen() {
             <Text style={styles.text}>Retake</Text>
           </TouchableOpacity>
         </>
+      ) : Platform.OS === "web" ? (
+        <View style={styles.container}>
+          <Text>Camera not supported on web. Please use on mobile.</Text>
+        </View>
       ) : (
         <>
           <Camera style={styles.camera} ref={cameraRef} />
