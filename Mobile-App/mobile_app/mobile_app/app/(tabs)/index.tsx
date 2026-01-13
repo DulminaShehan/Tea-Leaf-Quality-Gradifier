@@ -29,18 +29,36 @@ export default function HomeScreen() {
   };
 
   const analyzeTea = async () => {
+    if (!photo) return;
+    
     setProcessing(true);
     
-    // Simulate ML processing (replace with your actual ML model later)
-    setTimeout(() => {
+    try {
+      // OPTION 1: Use TensorFlow Lite (uncomment when ready)
+      // import { predictTeaQuality } from '../../services/mlService';
+      // const prediction = await predictTeaQuality(photo);
+      // setResult(prediction);
+      
+      // OPTION 2: Use Backend API (uncomment when ready)
+      // import { predictTeaQualityAPI } from '../../services/apiService';
+      // const prediction = await predictTeaQualityAPI(photo);
+      // setResult(prediction);
+      
+      // TEMPORARY: Simulated prediction (remove when ML is ready)
+      await new Promise(resolve => setTimeout(resolve, 2000));
       setResult({
         grade: "Premium Grade A",
         quality: 92,
         price: "LKR 450/kg",
         confidence: 94,
       });
+      
+    } catch (error) {
+      console.error('Analysis failed:', error);
+      alert('Failed to analyze image. Please try again.');
+    } finally {
       setProcessing(false);
-    }, 2000);
+    }
   };
 
   const reset = () => {
